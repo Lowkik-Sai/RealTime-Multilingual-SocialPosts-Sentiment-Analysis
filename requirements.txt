@@ -1,0 +1,21 @@
+# requirements-producer.txt
+kafka-python==2.0.2
+datasets
+
+#requirements-consumer.txt
+pyspark==3.5.1
+pymongo==3.12.1
+transformers==4.36.0
+torch   # install appropriate torch for your machine, e.g., pip install torch --index-url https://download.pytorch.org/whl/cpu
+sentencepiece
+langdetect
+fasttext-wheel
+pandas
+
+#Django requirements.txt
+dnspython
+chartjs==1.1
+Django==5.0.6
+kafka-python==2.0.2
+pyarrow==11.0.0
+pandas==2.1.0

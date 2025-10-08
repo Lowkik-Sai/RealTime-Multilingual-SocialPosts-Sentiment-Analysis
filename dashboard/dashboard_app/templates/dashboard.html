@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Real-Time Sentiment Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h2>🌍 Multilingual Sentiment Dashboard</h2>
+    <canvas id="sentimentChart"></canvas>
+
+    <script>
+        // Now sentiment_data is already JSON string
+        const data = JSON.parse('{{ sentiment_data|escapejs }}');
+
+        const labels = Object.keys(data);
+        const positive = labels.map(l => data[l]["POSITIVE"] || 0);
+        const negative = labels.map(l => data[l]["NEGATIVE"] || 0);
+        const neutral = labels.map(l => data[l]["NEUTRAL"] || 0);
+
+        new Chart(document.getElementById("sentimentChart"), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: "Positive", data: positive, backgroundColor: "green" },
+                    { label: "Negative", data: negative, backgroundColor: "red" },
+                    { label: "Neutral", data: neutral, backgroundColor: "gray" }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "top" } }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
