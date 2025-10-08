@@ -34,7 +34,16 @@
                 plugins: { legend: { position: "top" } }
             }
         });
+        function reloadData() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    document.body.innerHTML = html;
+                });
+        }
+        setInterval(reloadData, 5000);
     </script>
+
 
 </body>
 

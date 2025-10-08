@@ -12,6 +12,11 @@ langdetect
 fasttext-wheel
 pandas
 
+optimum 
+onnxruntime 
+accelerate 
+bitsandbytes
+
 #Django requirements.txt
 dnspython
 chartjs==1.1

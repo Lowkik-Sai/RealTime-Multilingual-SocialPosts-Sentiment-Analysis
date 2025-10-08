@@ -78,6 +78,7 @@ from transformers import pipeline
 
 # Global cache for the translation pipeline
 _translator_pipeline = None
+_translation_cache = {}
 
 def get_translator():
     """Lazily loads and caches the translation model."""
@@ -93,10 +94,14 @@ def translate_text(text: str) -> str:
     if not text or not isinstance(text, str):
         return ""
     try:
+        if text in _translation_cache:
+            return _translation_cache[text]
         translator = get_translator()
         # The pipeline returns a list with a dictionary
         result = translator(text, max_length=512)
+        _translation_cache[text] = result[0]['translation_text']
         return result[0]['translation_text']
+
     except Exception as e:
         warnings.warn(f"Translation failed: {e}")
         return text # Fallback to original text on error

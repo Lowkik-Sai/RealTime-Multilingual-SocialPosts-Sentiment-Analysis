@@ -12,8 +12,14 @@ from kafka import KafkaProducer
 from datasets import load_dataset
 
 def make_producer(bootstrap='localhost:9092'):
-    return KafkaProducer(bootstrap_servers=[bootstrap],
-                         value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    producer = KafkaProducer(
+                    bootstrap_servers=[bootstrap],
+                    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                    linger_ms=5,
+                    batch_size=32768
+                )
+
+    return producer
 
 def stream_exorde(producer, topic, rate, max_items=None):
     ds = load_dataset("Exorde/exorde-social-media-december-2024-week1", split="train")

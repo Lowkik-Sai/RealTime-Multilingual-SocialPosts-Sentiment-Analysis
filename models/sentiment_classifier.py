@@ -2,31 +2,40 @@ import threading
 from transformers import pipeline
 
 _lock = threading.Lock()
-_classifier = None
+_classifier = pipeline(
+                "sentiment-analysis",
+                model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+                device=-1
+            )
 
 def get_classifier():
     global _classifier
     with _lock:
         if _classifier is None:
-            # You may opt for a Twitter-trained model instead.
-            _classifier = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=-1)
+            # Pretrained for social media sentiment
+            _classifier = pipeline(
+                "sentiment-analysis",
+                model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+                device=-1
+            )
         return _classifier
 
-def classify_text(text):
+def classify_text(text: str):
     """
-    Returns: label (POSITIVE/NEGATIVE) and score (float)
-    For neutral handling you can threshold scores or use a different model.
+    Classifies English text as Positive, Negative, or Neutral.
+    Returns a dict with label and score.
     """
-    if not text:
+    if not text or not isinstance(text, str) or text.strip() == "":
         return {"label": "NEUTRAL", "score": 0.0}
+    
     # clf = get_classifier()
-    clf = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=-1)
+    clf = _classifier
     try:
-        out = clf(text[:512])  # limit length
-        res = out[0]
-        return {"label": res['label'], "score": float(res['score'])}
+        result = clf(text[:512])[0]
+        return {"label": result["label"], "score": float(result["score"])}
     except Exception as e:
         return {"label": "NEUTRAL", "score": 0.0}
+
 
 # models/sentiment_classifier.py
 # from transformers import pipeline
