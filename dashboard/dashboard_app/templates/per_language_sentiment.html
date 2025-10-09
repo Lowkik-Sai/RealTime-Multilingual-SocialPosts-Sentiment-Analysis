@@ -1,0 +1,130 @@
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <title>Per Language Sentiment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h2>Per Language Sentiment</h2>
+    <canvas id="sentimentChart" width="600" height="400"></canvas>
+
+    <script>
+        const data = {{ sentiment_data| safe }};
+        const labels = [];
+        const datasets = [];
+
+        let colors = { "positive": "green", "neutral": "gray", "negative": "red" };
+
+        Object.keys(data).forEach(lang => {
+            labels.push(lang);
+        });
+
+        const sentiments = ["positive", "neutral", "negative"];
+        sentiments.forEach(sent => {
+            const counts = [];
+            Object.keys(data).forEach(lang => {
+                counts.push(data[lang][sent] || 0);
+            });
+            datasets.push({
+                label: sent,
+                data: counts,
+                backgroundColor: colors[sent]
+            });
+        });
+
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: datasets },
+            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+        });
+    </script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Per Language Sentiment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #controls {
+            margin-bottom: 10px;
+        }
+
+        button.toggle {
+            margin-right: 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Top Languages Sentiment</h2>
+
+    <div id="controls">
+        <button class="toggle" data-sentiment="positive" style="background:green;color:white;">Positive</button>
+        <button class="toggle" data-sentiment="neutral" style="background:gray;color:white;">Neutral</button>
+        <button class="toggle" data-sentiment="negative" style="background:red;color:white;">Negative</button>
+    </div>
+
+    <canvas id="sentimentChart" width="600" height="200"></canvas>
+
+    <script>
+        let chart;
+        let enabledSentiments = { positive: true, neutral: true, negative: true };
+
+        function fetchData() {
+            $.get("{% url 'per_language_data' %}", function (data) {
+                const labels = Object.keys(data);
+                const sentiments = ["positive", "neutral", "negative"];
+                const colors = { "positive": "green", "neutral": "gray", "negative": "red" };
+                const datasets = [];
+
+                sentiments.forEach(sent => {
+                    if (enabledSentiments[sent]) {
+                        const counts = labels.map(lang => data[lang][sent] || 0);
+                        datasets.push({
+                            label: sent,
+                            data: counts,
+                            backgroundColor: colors[sent]
+                        });
+                    }
+                });
+
+                if (chart) {
+                    chart.data.labels = labels;
+                    chart.data.datasets = datasets;
+                    chart.update();
+                } else {
+                    const ctx = document.getElementById('sentimentChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: datasets },
+                        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+                    });
+                }
+            });
+        }
+
+        // Toggle sentiment
+        $(".toggle").click(function () {
+            const sent = $(this).data("sentiment");
+            enabledSentiments[sent] = !enabledSentiments[sent];
+            fetchData();
+        });
+
+        // Initial fetch
+        fetchData();
+
+        // Auto-refresh every 10 sec
+        setInterval(fetchData, 10000);
+    </script>
+</body>
+
+</html>
